@@ -23,5 +23,5 @@ RUN chmod +x ./start.sh
 
 EXPOSE 5000
 
-# Use start script so $PORT env var is honored
-CMD ["sh", "-c", "./start.sh"]
+# Use the Python start wrapper which reads PORT and execs gunicorn
+CMD ["python", "start.py"]

@@ -1,1 +1,1 @@
-web: sh -c "./start.sh"
+web: python start.py
