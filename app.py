@@ -18,7 +18,7 @@ MODELS = {
     'cnn_h5': {
         'path': os.path.join(os.path.dirname(__file__), 'simple_cnn_model.h5'),
         'name': 'Simple CNN Model (H5)',
-        'description': '2-channel CNN model',
+        'description': 'Basic CNN model',
         'classes': {0: 'Healthy/Normal', 1: 'Benign Tumor', 2: 'Malignant Tumor'}
     }
 }
