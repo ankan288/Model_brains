@@ -20,12 +20,6 @@ MODELS = {
         'name': 'Simple CNN Model (H5)',
         'description': '2-channel CNN model',
         'classes': {0: 'Healthy/Normal', 1: 'Benign Tumor', 2: 'Malignant Tumor'}
-    },
-    'brain_tumor_detector': {
-        'path': os.path.join(os.path.dirname(__file__), 'brain_tumor_detector.h5'),
-        'name': 'Brain Tumor Detector (H5)',
-        'description': 'Specialized brain tumor detection model',
-        'classes': {0: 'No Tumor', 1: 'Tumor Detected'}
     }
 }
 
