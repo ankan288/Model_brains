@@ -38,12 +38,8 @@ input_channels = 3
 def get_available_models():
     """Get list of available models that exist on disk"""
     available = {}
-    print(f"Checking for available models...")
     for key, info in MODELS.items():
-        model_path = info['path']
-        exists = os.path.exists(model_path)
-        print(f"  - {key}: {model_path} -> {'EXISTS' if exists else 'NOT FOUND'}")
-        if exists:
+        if os.path.exists(info['path']):
             available[key] = info
     print(f"Available models: {list(available.keys())}")
     return available
