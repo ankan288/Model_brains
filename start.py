@@ -14,16 +14,20 @@ import shutil
 
 
 def main():
+    print("=== DEBUG: start.py is running ===")
     port = os.environ.get("PORT", "5000")
+    print(f"=== DEBUG: Raw PORT from environment: '{port}' ===")
     # validate port is numeric-ish
     try:
         int(port)
+        print(f"=== DEBUG: PORT '{port}' is valid integer ===")
     except Exception:
-        print(f"Invalid PORT value '{port}', defaulting to 5000")
+        print(f"=== DEBUG: Invalid PORT value '{port}', defaulting to 5000 ===")
         port = "5000"
 
     bind = f"0.0.0.0:{port}"
-    print(f"Starting gunicorn on {bind}")
+    print(f"=== DEBUG: Starting gunicorn on {bind} ===")
+    print(f"=== DEBUG: Full environment PORT = {repr(os.environ.get('PORT'))} ===")
 
     # Ensure gunicorn is available on PATH
     gunicorn_path = shutil.which("gunicorn")
