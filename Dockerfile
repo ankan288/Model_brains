@@ -18,6 +18,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy app
 COPY . /app
 
+# Make start script executable
+RUN chmod +x ./start.sh
+
 EXPOSE 5000
 
-CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:5000", "app:app"]
+# Use start script so $PORT env var is honored
+CMD ["sh", "-c", "./start.sh"]
