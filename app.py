@@ -7,19 +7,19 @@ from tensorflow.keras.models import load_model
 
 app = Flask(__name__, static_folder='static')
 
-# Available models
+# Available models (ordered by preference - first one becomes default)
 MODELS = {
-    'cnn_h5': {
-        'path': os.path.join(os.path.dirname(__file__), 'simple_cnn_model.h5'),
-        'name': 'Simple CNN Model (H5)',
-        'description': '2-channel CNN model',
-        'classes': {0: 'Healthy/Normal', 1: 'Benign Tumor', 2: 'Malignant Tumor'}
-    },
     'keras_model': {
         'path': os.path.join(os.path.dirname(__file__), 'my_model.keras'),
         'name': 'Keras Model',
         'description': 'Modern Keras format model',
         'classes': {0: 'No Tumor', 1: 'Glioma', 2: 'Meningioma', 3: 'Pituitary'}
+    },
+    'cnn_h5': {
+        'path': os.path.join(os.path.dirname(__file__), 'simple_cnn_model.h5'),
+        'name': 'Simple CNN Model (H5)',
+        'description': '2-channel CNN model',
+        'classes': {0: 'Healthy/Normal', 1: 'Benign Tumor', 2: 'Malignant Tumor'}
     },
     'brain_tumor_detector': {
         'path': os.path.join(os.path.dirname(__file__), 'brain_tumor_detector.h5'),
