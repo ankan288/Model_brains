@@ -212,5 +212,11 @@ if __name__ == '__main__':
     else:
         print("Warning: No models found! Place models in the directory.")
     
-    # debug=True for development only
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # For production, run via gunicorn
+    if os.environ.get('RAILWAY_ENVIRONMENT'):
+        # Production: let gunicorn handle this via start.py
+        print("Running in Railway production mode")
+        pass
+    else:
+        # Development: use Flask dev server
+        app.run(host='0.0.0.0', port=5000, debug=True)
