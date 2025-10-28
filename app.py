@@ -202,16 +202,18 @@ def predict():
         return jsonify({'error': str(e)}), 500
 
 
+# Load the first available model by default (runs in both dev and production)
+available_models = get_available_models()
+if available_models:
+    first_model = list(available_models.keys())[0]
+    load_selected_model(first_model)
+    print(f"Default model loaded: {MODELS[first_model]['name']}")
+else:
+    print("Warning: No models found! Place models in the directory.")
+
+
 if __name__ == '__main__':
-    # Load the first available model by default
-    available_models = get_available_models()
-    if available_models:
-        first_model = list(available_models.keys())[0]
-        load_selected_model(first_model)
-        print(f"Server starting with default model: {MODELS[first_model]['name']}")
-    else:
-        print("Warning: No models found! Place models in the directory.")
-    
+    print("Starting Flask development server...")
     # For production, run via gunicorn
     if os.environ.get('RAILWAY_ENVIRONMENT'):
         # Production: let gunicorn handle this via start.py
