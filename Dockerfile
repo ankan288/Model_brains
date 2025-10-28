@@ -23,5 +23,6 @@ RUN chmod +x ./start.sh
 
 EXPOSE 5000
 
-# Use the Python start wrapper which reads PORT and execs gunicorn
-CMD ["python", "start.py"]
+# Use the Python start wrapper which reads PORT and execs gunicorn.
+# Set ENTRYPOINT so platform start commands cannot override with an un-expanded $PORT.
+ENTRYPOINT ["python", "start.py"]
