@@ -1,1 +1,1 @@
-web: gunicorn --workers 4 --bind 0.0.0.0:$PORT app:app
+web: sh -c "gunicorn --workers 4 --bind 0.0.0.0:$PORT app:app"
