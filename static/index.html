@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AI Medical Imaging - Brain Tumor Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+        line-height: 1.6;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 3rem;
+      }
+      
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+      
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        font-weight: 400;
+      }
+      
+      .main-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+      }
+      
+      .upload-section {
+        background: #f8fafc;
+        border: 2px dashed #cbd5e0;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+      }
+      
+      .upload-section:hover {
+        border-color: #667eea;
+        background: #f0f4ff;
+      }
+      
+      .model-selector {
+        margin-bottom: 2rem;
+      }
+      
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+      
+      .form-label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .form-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        background: white;
+        transition: all 0.3s ease;
+      }
+      
+      .form-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+      
+      .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        margin-right: 1rem;
+      }
+      
+      .file-input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+      
+      .file-input-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .file-input-button:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+      
+      .upload-btn {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+      }
+      
+      .upload-btn:disabled {
+        background: #a0aec0;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .preview-container {
+        text-align: center;
+        margin: 2rem 0;
+      }
+      
+      .preview {
+        max-width: 400px;
+        max-height: 400px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border: 4px solid white;
+      }
+      
+      .results {
+        margin-top: 2rem;
+      }
+      
+      .diagnosis-card {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        border-left: 5px solid #48bb78;
+      }
+      
+      .diagnosis-card.warning {
+        border-left-color: #ed8936;
+        background: linear-gradient(135deg, #fffbf0 0%, #fef5e7 100%);
+      }
+      
+      .diagnosis-card.danger {
+        border-left-color: #e53e3e;
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+      }
+      
+      .predictions-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+      }
+      
+      .predictions-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+      }
+      
+      .predictions-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      
+      .predictions-table tbody tr:hover {
+        background: #f7fafc;
+      }
+      
+      .confidence-high {
+        color: #38a169;
+        font-weight: 600;
+      }
+      
+      .confidence-medium {
+        color: #d69e2e;
+        font-weight: 600;
+      }
+      
+      .confidence-low {
+        color: #e53e3e;
+        font-weight: 600;
+      }
+      
+      .status-message {
+        padding: 1rem;
+        border-radius: 10px;
+        margin: 1rem 0;
+        font-weight: 500;
+      }
+      
+      .status-loading {
+        background: #bee3f8;
+        color: #2b6cb0;
+        border: 1px solid #90cdf4;
+      }
+      
+      .status-error {
+        background: #fed7d7;
+        color: #c53030;
+        border: 1px solid #feb2b2;
+      }
+      
+      .status-success {
+        background: #c6f6d5;
+        color: #2f855a;
+        border: 1px solid #9ae6b4;
+      }
+      
+      .disclaimer {
+        background: #fff5f5;
+        border: 1px solid #feb2b2;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        color: #742a2a;
+      }
+      
+      .disclaimer h4 {
+        margin-bottom: 0.5rem;
+        color: #c53030;
+      }
+      
+      .icon {
+        margin-right: 0.5rem;
+      }
+      
+      details {
+        margin-top: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+        color: #4a5568;
+      }
+      
+      .raw-output {
+        background: #1a202c;
+        color: #e2e8f0;
+        padding: 1rem;
+        border-radius: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+      }
+      
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+        
+        .header h1 {
+          font-size: 2rem;
+        }
+        
+        .main-card {
+          padding: 1.5rem;
+        }
+        
+        .file-input-wrapper {
+          display: block;
+          margin-bottom: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1><i class="fas fa-brain icon"></i>AI Medical Imaging</h1>
+        <p>Advanced Brain Tumor Detection & Classification System</p>
+      </div>
+
+      <div class="main-card">
+        <div class="model-selector">
+          <div class="form-group">
+            <label class="form-label" for="modelSelect">
+              <i class="fas fa-cogs icon"></i>Select AI Model
+            </label>
+            <select id="modelSelect" class="form-select">
+              <option value="">Loading available models...</option>
+            </select>
+            <div id="modelInfo" style="margin-top: 0.5rem; color: #718096; font-size: 0.9rem;"></div>
+          </div>
+        </div>
+
+        <div class="upload-section">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-upload icon"></i>Upload Medical Image
+            </label>
+            <div style="margin-top: 1rem;">
+              <div class="file-input-wrapper">
+                <input id="fileInput" type="file" accept="image/*" class="file-input" />
+                <button class="file-input-button">
+                  <i class="fas fa-folder-open"></i>
+                  Choose File
+                </button>
+              </div>
+              <button id="uploadBtn" class="upload-btn" disabled>
+                <i class="fas fa-brain"></i>
+                Analyze Image
+              </button>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.9rem; color: #718096;">
+              Supported formats: JPG, PNG, GIF | Recommended: Brain MRI scans
+            </div>
+          </div>
+        </div>
+        
+        <div class="preview-container">
+          <img id="preview" class="preview" src="" alt="Medical image preview" style="display:none;"/>
+        </div>
+
+        <div id="status" class="results"></div>
+      </div>
+
+      <div class="disclaimer">
+        <h4><i class="fas fa-exclamation-triangle icon"></i>Medical Disclaimer</h4>
+        <p>This AI system is for educational and research purposes only. Results should not be used for actual medical diagnosis. Always consult qualified healthcare professionals for medical decisions.</p>
+      </div>
+    </div>
+
+    <script>
+      const fileInput = document.getElementById('fileInput');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const preview = document.getElementById('preview');
+      const status = document.getElementById('status');
+      const modelSelect = document.getElementById('modelSelect');
+      const modelInfo = document.getElementById('modelInfo');
+
+      // Load available models on page load
+      async function loadModels() {
+        try {
+          const res = await fetch('/models');
+          const data = await res.json();
+          
+          modelSelect.innerHTML = '';
+          const models = data.models || {};
+          
+          if (Object.keys(models).length === 0) {
+            modelSelect.innerHTML = '<option value="">No models available</option>';
+            return;
+          }
+          
+          for (const [key, info] of Object.entries(models)) {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = info.name;
+            if (key === data.current) {
+              option.selected = true;
+            }
+            modelSelect.appendChild(option);
+          }
+          
+          updateModelInfo();
+        } catch (err) {
+          modelSelect.innerHTML = '<option value="">Error loading models</option>';
+          console.error('Error loading models:', err);
+        }
+      }
+
+      function updateModelInfo() {
+        const selectedKey = modelSelect.value;
+        if (!selectedKey) {
+          modelInfo.textContent = '';
+          return;
+        }
+        
+        // Get model info from the current selection
+        modelInfo.textContent = 'Loading model info...';
+        fetch('/models').then(res => res.json()).then(data => {
+          const model = data.models[selectedKey];
+          if (model) {
+            modelInfo.textContent = model.description;
+          }
+        });
+      }
+
+      // Switch model when selection changes
+      modelSelect.addEventListener('change', async () => {
+        const selectedKey = modelSelect.value;
+        if (!selectedKey) return;
+        
+        status.innerHTML = '<div class="status-message status-loading"><i class="fas fa-spinner fa-spin"></i> Switching AI model...</div>';
+        try {
+          const res = await fetch('/switch_model', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model_key: selectedKey })
+          });
+          
+          const data = await res.json();
+          if (res.ok) {
+            status.innerHTML = `<div class="status-message status-success">
+              <i class="fas fa-check-circle"></i> Successfully switched to: <strong>${data.model}</strong><br>
+              <small>Input requirements: ${data.input_size[0]}×${data.input_size[1]} pixels, ${data.input_channels} channels</small>
+            </div>`;
+            updateModelInfo();
+          } else {
+            status.innerHTML = `<div class="status-message status-error"><i class="fas fa-exclamation-circle"></i> Error: ${data.error}</div>`;
+          }
+        } catch (err) {
+          status.innerHTML = `<div class="status-message status-error"><i class="fas fa-exclamation-circle"></i> Request failed: ${err.message}</div>`;
+        }
+      });
+
+      fileInput.addEventListener('change', e => {
+        const f = e.target.files[0];
+        if(!f) {
+          uploadBtn.disabled = true;
+          preview.style.display = 'none';
+          return;
+        }
+        preview.src = URL.createObjectURL(f);
+        preview.style.display = 'block';
+        uploadBtn.disabled = false;
+        
+        // Update file input button text
+        const fileName = f.name.length > 20 ? f.name.substring(0, 20) + '...' : f.name;
+        document.querySelector('.file-input-button').innerHTML = `<i class="fas fa-check-circle"></i> ${fileName}`;
+      });
+
+      uploadBtn.addEventListener('click', async () => {
+        const f = fileInput.files[0];
+        const selectedModel = modelSelect.value;
+        
+        if(!selectedModel){ 
+          status.innerHTML = '<div class="status-message status-error"><i class="fas fa-exclamation-circle"></i> Please select an AI model first.</div>'; 
+          return; 
+        }
+        if(!f){ 
+          status.innerHTML = '<div class="status-message status-error"><i class="fas fa-exclamation-circle"></i> Please choose an image file first.</div>'; 
+          return; 
+        }
+        
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        status.innerHTML = '<div class="status-message status-loading"><i class="fas fa-brain fa-pulse"></i> AI is analyzing your medical image...</div>';
+        
+        const fd = new FormData();
+        fd.append('file', f);
+        
+        try{
+          const res = await fetch('/predict', { method: 'POST', body: fd });
+          const data = await res.json();
+          
+          if(!res.ok){ 
+            status.innerHTML = `<div class="status-message status-error"><i class="fas fa-exclamation-circle"></i> <strong>Analysis Error:</strong> ${data.error || res.statusText}</div>`; 
+            return; 
+          }
+          
+          const preds = data.predictions || [];
+          const stats = data.stats || {};
+          
+          let html = '<h3 style="color: #4a5568; margin-bottom: 1.5rem;"><i class="fas fa-chart-bar icon"></i>Analysis Results</h3>';
+          
+          // Main diagnosis card
+          if(stats.predicted_class_name) {
+            const confidence = stats.max_probability;
+            let diagnosisClass = 'diagnosis-card';
+            let iconClass = 'fas fa-info-circle';
+            
+            if(confidence > 0.8) {
+              if(stats.predicted_class_name.toLowerCase().includes('tumor') || 
+                 stats.predicted_class_name.toLowerCase().includes('malignant')) {
+                diagnosisClass += ' danger';
+                iconClass = 'fas fa-exclamation-triangle';
+              } else {
+                diagnosisClass += '';
+                iconClass = 'fas fa-check-circle';
+              }
+            } else {
+              diagnosisClass += ' warning';
+              iconClass = 'fas fa-question-circle';
+            }
+            
+            html += `<div class="${diagnosisClass}">
+              <h3 style="margin-bottom: 1rem; display: flex; align-items: center;">
+                <i class="${iconClass}" style="margin-right: 0.5rem;"></i>
+                Primary Diagnosis
+              </h3>
+              <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">${stats.predicted_class_name}</div>
+              <div style="font-size: 1.1rem; opacity: 0.8;">Confidence Level: ${(confidence*100).toFixed(1)}%</div>
+            </div>`;
+          }
+          
+          // Predictions table
+          html += '<table class="predictions-table">';
+          html += '<thead><tr><th><i class="fas fa-hashtag"></i> Rank</th><th><i class="fas fa-stethoscope"></i> Diagnosis</th><th><i class="fas fa-percentage"></i> Confidence</th></tr></thead>';
+          html += '<tbody>';
+          
+          preds.slice(0,5).forEach((p,i) => {
+            const className = p.class_name || `Class ${p.class}`;
+            let confidenceClass = 'confidence-low';
+            if(p.probability > 0.8) confidenceClass = 'confidence-high';
+            else if(p.probability > 0.5) confidenceClass = 'confidence-medium';
+            
+            html += `<tr>
+              <td style="text-align:center; font-weight: 600;">${i+1}</td>
+              <td style="font-weight: 600;">${className}</td>
+              <td class="${confidenceClass}">${(p.probability*100).toFixed(2)}%</td>
+            </tr>`;
+          });
+          html += '</tbody></table>';
+          
+          // Technical details
+          if(stats.total_classes) {
+            html += '<details><summary><i class="fas fa-cog"></i> Technical Analysis Details</summary>';
+            html += '<div style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">';
+            html += `<div><strong>Total Classes:</strong> ${stats.total_classes.toLocaleString()}</div>`;
+            html += `<div><strong>Highest Confidence:</strong> ${(stats.max_probability*100).toFixed(2)}%</div>`;
+            html += `<div><strong>Average Probability:</strong> ${(stats.mean_probability*100).toFixed(4)}%</div>`;
+            html += '</div></details>';
+          }
+          
+          // Raw output
+          if(data.raw && data.raw.length > 0) {
+            html += '<details style="margin-top: 1rem;"><summary><i class="fas fa-code"></i> Raw Model Output</summary>';
+            html += '<div class="raw-output">' + 
+                   data.raw.map((v,i) => `[${i.toString().padStart(3, '0')}]: ${v.toFixed(6)}`).join('\n') + '</div></details>';
+          }
+          
+          status.innerHTML = html;
+        }catch(err){
+          status.innerHTML = `<div class="status-message status-error"><i class="fas fa-exclamation-circle"></i> <strong>Network Error:</strong> ${err.message}</div>`;
+        } finally {
+          uploadBtn.disabled = false;
+          uploadBtn.innerHTML = '<i class="fas fa-brain"></i> Analyze Image';
+        }
+      });
+
+      // Load models when page loads
+      loadModels();
+    </script>
+  </body>
+</html>

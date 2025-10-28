@@ -1,0 +1,19 @@
+# Python venv
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Editor files
+.vscode/
+.idea/
+
+# Model files (comment out if you want to commit models)
+#brain_tumor_detector.h5
+#simple_cnn_model.h5
+#my_model.keras
+
+# OS
+.DS_Store
+Thumbs.db
